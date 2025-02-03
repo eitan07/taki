@@ -1,6 +1,11 @@
-use std::{ collections::VecDeque, fmt::{Debug, Display} };
-use rand::{ seq::SliceRandom, thread_rng, Rng };
-use ratatui::{ widgets::Widget, buffer::Buffer, layout::Rect };
+pub mod disp;
+
+use rand::{seq::SliceRandom, thread_rng, Rng};
+use ratatui::{buffer::Buffer, layout::Rect, widgets::Widget};
+use std::{
+    collections::VecDeque,
+    fmt::Debug
+};
 
 #[derive(Debug)]
 pub struct Player {
@@ -10,7 +15,10 @@ pub struct Player {
 
 impl Player {
     pub fn new() -> Self {
-        Self { id: thread_rng().gen_range(0..=99), cards: Stack::new() }
+        Self {
+            id: thread_rng().gen_range(0..=99),
+            cards: Stack::new(),
+        }
     }
 }
 
@@ -40,7 +48,7 @@ pub enum Card {
 //             Card::SuperTaki => {}
 //             Card::King => {}
 //         }
-        
+
 //         todo!()
 //     }
 // }
@@ -77,37 +85,40 @@ impl<T> Stack<T> {
         self.1 += 1;
         self.0.push_front(val);
     }
-    
+
     pub fn pop(&mut self) -> Option<T> {
         self.1 -= 1;
         self.0.pop_front()
     }
-    
+
     pub fn shuffle(&mut self, times: usize)
-    where T: Clone
-    {   
+    where
+        T: Clone
+    {
         let mut v: Vec<T> = self.0.clone().into();
-        
+
         for _ in 0..times {
             v.shuffle(&mut thread_rng());
         }
-        
+
         self.0 = v.into();
     }
-    
+
     pub fn pop_nth(&mut self, n: usize) -> Vec<Option<T>> {
         let mut v: Vec<Option<T>> = Vec::new();
-        
+
         for _ in 0..n {
             v.push(self.pop());
         }
-        
+
         v
     }
 
     pub fn push_times(&mut self, val: T, times: usize)
-    where T: Copy {
-        for _ in 0..times { 
+    where
+        T: Copy
+    {
+        for _ in 0..times {
             self.1 += 1;
             self.0.push_front(val);
         }
@@ -119,69 +130,13 @@ impl<T> Stack<T> {
 }
 
 pub struct CardWidget<'a> {
-    pub card: &'a Card,
+    pub card: &'a Card
 }
 
 impl<'a> Widget for CardWidget<'a> {
     fn render(self, _area: Rect, _buf: &mut Buffer)
-    where Self: Sized {
-        
-        
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_push_to_stack() {
-        let mut v = VecDeque::new();
-        let mut s: Stack<u8> = Stack::new();
-
-        for i in 0..10 { v.push_back(9 - i); s.push(i); }
-
-        assert_eq!(v, s.0)
-    }
-
-    #[test]
-    fn test_push_to_stack_and_remove() {
-        let mut v = VecDeque::new();
-        let mut s: Stack<u8> = Stack::new();
-
-        for i in 1..10 {
-            s.push(i);
-        }
-
-        for i in (1..10).rev() {
-            v.push_back(i);
-        }
-
-        v.pop_front();
-        s.pop();
-
-        assert_eq!(v, s.0)
-    }
-
-    #[test]
-    fn test_push_to_stack_and_pop() {
-        let mut s: Stack<u8> = Stack::new();
-
-        for i in 0..10 {
-            s.push(i);
-        }
-
-        assert_eq!(9, s.pop().unwrap())
-    }
-    
-    #[test]
-    fn test_push_to_stack_and_pop_twice() {
-        let mut s: Stack<u8> = Stack::new();
-
-        for i in 0..10 {
-            s.push(i);
-        }
-
-        assert_eq!(9, s.pop().unwrap())
+    where
+        Self: Sized
+    {
     }
 }

@@ -8,10 +8,10 @@ fn main() -> Result<()> {
     let mut card_bank = Stack::new();
     let mut p1 = Player::new();
     let mut p2 = Player::new();
-    
+
     _init_card_bank(&mut card_bank);
     let mut t = ratatui::init();
-    
+
     let parent = Layout::default()
         .direction(Direction::Vertical)
         .constraints([
@@ -35,8 +35,7 @@ fn main() -> Result<()> {
             let x = Paragraph::new("Main Frame")
                 .alignment(ratatui::layout::Alignment::Center)
                 .style(Style::default().light_green().on_blue());
-
-            
+ 
             let sb = Paragraph::new("Status Bar")
                 .alignment(ratatui::layout::Alignment::Center)
                 .style(Style::default().magenta().on_yellow());
@@ -45,8 +44,8 @@ fn main() -> Result<()> {
             frame.render_widget(x, mf);
             frame.render_widget(sb, s_bar);
         })?;
-
-
+        
+        
         // Poll events
         if let Ok(e) = event::read() {
             if let Event::Key(ke) = e {
@@ -65,7 +64,7 @@ fn main() -> Result<()> {
         let p = Paragraph::new("Hello World!").cyan().bold();
         f.render_widget(p, Rect::new(5, 5, 20, 20));
     })?;
-    
+
     Ok(())
 }
 
@@ -78,7 +77,7 @@ fn _init_card_bank(card_bank: &mut Stack<Card>) {
             3 => CardColor::Yellow,
             _ => unreachable!()
         };
-    
+
         (0..2).for_each(|_| (1..=9).for_each(|n| card_bank.push(Card::Numeric(n, c))));
         card_bank.push_times(Card::Stop(c), 2);
         card_bank.push_times(Card::ChangeDir(c), 2);
@@ -86,10 +85,10 @@ fn _init_card_bank(card_bank: &mut Stack<Card>) {
         card_bank.push_times(Card::Taki(c), 2);
         card_bank.push_times(Card::Kah2(c), 2);
     }
-    
+
     card_bank.push_times(Card::ChangeColor, 2);
     card_bank.push_times(Card::SuperTaki, 2);
     card_bank.push_times(Card::King, 2);
-    
+
     card_bank.shuffle(5);
 }
