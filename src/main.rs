@@ -4,11 +4,14 @@ use ratatui::{layout::{Constraint, Direction, Layout, Rect, Spacing}, style::{St
 use taki::*;
 use std::{fs::File, io::{stdout, Read}};
 
+
 fn main() -> Result<()> {
     let mut card_bank = Stack::new();
     let mut p1 = Player::new();
     let mut p2 = Player::new();
-
+    
+    execute!(stdout(), terminal::EnterAlternateScreen)?;
+    terminal::enable_raw_mode()?;
     _init_card_bank(&mut card_bank);
     let mut t = ratatui::init();
 
@@ -45,7 +48,7 @@ fn main() -> Result<()> {
             frame.render_widget(sb, s_bar);
         })?;
         
-        
+
         // Poll events
         if let Ok(e) = event::read() {
             if let Event::Key(ke) = e {
@@ -57,7 +60,8 @@ fn main() -> Result<()> {
             }
         }
     }
-
+    
+    terminal::disable_raw_mode()?;
     execute!(stdout(), terminal::LeaveAlternateScreen)?;
 
     t.draw(|f| {
