@@ -8,7 +8,7 @@ use ratatui::{
     style::{Color, Style, Stylize},
     widgets::{Block, Borders, Paragraph},
 };
-use std::io::stdout;
+use std::{io::stdout, time::Duration};
 use taki::{disp::CardSetLoader, *};
 
 fn main() -> Result<()> {
@@ -36,17 +36,17 @@ fn main() -> Result<()> {
     }
 
     let mut p1_cards_widgets: Vec<CardWidget>;
-    
+
     let back_card_widget = CardWidget::new(&cardset, &Card::CardsBack);
     while running {
         // if event::poll(Duration::from_millis(500))? {
 
         p1_cards_widgets = p1
-        .cards
-        .clone()
-        .into_iter()
-        .map(|card| CardWidget::new(&cardset, &card))
-        .collect::<Vec<_>>();
+            .cards
+            .clone()
+            .into_iter()
+            .map(|card| CardWidget::new(&cardset, &card))
+            .collect::<Vec<_>>();
 
         // Render screen
         t.draw(|mainframe| {
@@ -103,12 +103,17 @@ fn main() -> Result<()> {
         })?;
 
         // Poll events
-        if let Ok(e) = event::read() {
-            if let Event::Key(ke) = e {
-                match ke.code {
-                    KeyCode::Char('q') | KeyCode::Char('Q') => running ^= true,
-                    KeyCode::Char(' ') => { p1.cards.push(card_bank.pop().unwrap()); p1.cards_count += 1 },
-                    _ => (),
+        if event::poll(Duration::from_millis(100))? {
+            if let Ok(e) = event::read() {
+                if let Event::Key(ke) = e {
+                    match ke.code {
+                        KeyCode::Char('q') | KeyCode::Char('Q') => running ^= true,
+                        KeyCode::Char(' ') => {
+                            p1.cards.push(card_bank.pop().unwrap());
+                            p1.cards_count += 1
+                        }
+                        _ => (),
+                    }
                 }
             }
         }

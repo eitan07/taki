@@ -6,17 +6,17 @@ use ratatui::{
     buffer::Buffer,
     layout::Rect,
     style::{Color, Style, Stylize},
-    widgets::Widget
+    widgets::Widget,
 };
 use std::{
     collections::{vec_deque::IntoIter, VecDeque},
-    fmt::Debug
+    fmt::Debug,
 };
 
 #[derive(Debug)]
 pub struct Player {
     pub id: u8,
-    pub cards: Stack<Card>,
+    pub cards: Vec<Card>,
     pub cards_count: usize,
 }
 
@@ -24,7 +24,7 @@ impl Player {
     pub fn new() -> Self {
         Self {
             id: thread_rng().gen_range(0..=99),
-            cards: Stack::new(),
+            cards: Vec::new(),
             cards_count: 0usize,
         }
     }
