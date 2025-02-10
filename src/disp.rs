@@ -1,6 +1,11 @@
 use once_cell::unsync::Lazy;
 use regex::*;
-use std::{collections::HashMap, fs, io::{self, ErrorKind}, path::Path};
+use std::{
+    collections::HashMap,
+    fs,
+    io::{self, ErrorKind},
+    path::Path,
+};
 
 use crate::Card;
 
@@ -14,10 +19,10 @@ pub struct CardSet {
 impl CardSet {
     pub fn get_card_by_name(&self, name: &str) -> Result<String, io::Error> {
         if let Some(card) = self.set.get(name) {
-            return Ok(card.clone())
+            return Ok(card.clone());
         }
 
-        Err(io::Error::new(ErrorKind::NotFound, "Card not found in this set! Are you sure it was loaded correctly with no typos?"))
+        Err(io::Error::new(ErrorKind::NotFound, format!("Card not found in this set! Are you sure it was loaded correctly with no typos? ({:?}) {:?}", name, self.set)))
     }
     pub fn get_card_by_instance(&self, card: &Card) -> Result<String, io::Error> {
         match card {
@@ -33,12 +38,16 @@ impl CardSet {
             Card::Stop(_) => self.get_card_by_name("Stop"),
             Card::ChangeDir(_) => self.get_card_by_name("ChangeDir"),
             Card::Plus(_) => self.get_card_by_name("Plus"),
-            Card::Kah2(_) => self.get_card_by_name("Take2"),
+            Card::Kah2(_) => self.get_card_by_name("Kah2"),
             Card::Taki(_) => self.get_card_by_name("Taki"),
-            Card::ChangeColor => self.get_card_by_name("ChangeCol"),
+            Card::ChangeColor => self.get_card_by_name("ChangeColor"),
             Card::King => self.get_card_by_name("King"),
             Card::SuperTaki => self.get_card_by_name("SuperTaki"),
-            _ => Err(io::Error::new(ErrorKind::NotFound, "Card not found in this set! Are you sure it was loaded correctly with no typos?"))
+            Card::CardsBack => self.get_card_by_name("CardsBack"),
+            _ => Err(io::Error::new(
+                ErrorKind::NotFound,
+                "Card not found in this set! Are you sure it was loaded correctly with no typos?",
+            )),
         }
     }
 }
@@ -50,23 +59,25 @@ impl CardSetLoader {
         let mut hm: HashMap<String, String> = HashMap::new();
         let binding = fs::read_to_string(f)?;
         let lines = binding.as_str().lines().collect::<Vec<&str>>();
-        
+
         let mut val: String = String::new();
         let mut key = "";
         for i in 0..lines.len() {
             if let Some(cap) = KEY_SECTION_REGEX.captures(&lines[i]) {
-                if let Some(cap) = cap.get(1) {                   
+                if let Some(cap) = cap.get(1) {
                     if key != "" {
-                        hm.insert(key.to_string(), val);
+                        hm.insert(key.to_string(), val.trim().to_string());
                     }
                     key = cap.as_str();
                     val = String::new();
                 }
             } else {
-                val += &lines[i];
+                val += &lines[i].trim();
                 val += "\n";
             }
         }
+
+        hm.insert(key.to_string(), val.trim().to_string());
 
         Ok(CardSet { set: hm })
     }
